@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/Unlock"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="解锁" />
+        <item
+            android:id="@+id/Scan"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="蓝牙搜索" />
+        <item
+            android:id="@+id/DataManagement"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="数据管理" />
+        <item
+            android:id="@+id/Settings"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="选项" />
+    </group>
+
+    <item android:title="--------华丽的分割线--------">
+        <menu>
+            <item
+                android:id="@+id/Share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="分享" />
+            <item
+                android:id="@+id/About"
+                android:icon="@drawable/ic_menu_send"
+                android:title="关于" />
+        </menu>
+    </item>
+
+</menu>
