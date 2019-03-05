@@ -28,5 +28,6 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
     //依赖包
-    compile 'pub.devrel:easypermissions:3.0.0'
+    implementation 'pub.devrel:easypermissions:3.0.0'
+//    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
 }
