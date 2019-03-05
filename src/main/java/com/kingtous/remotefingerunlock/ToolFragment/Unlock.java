@@ -1,12 +1,8 @@
 package com.kingtous.remotefingerunlock.ToolFragment;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.KeyguardManager;
-import android.content.DialogInterface;
 import android.hardware.fingerprint.FingerprintManager;
-import android.icu.text.UnicodeSetSpanner;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +16,8 @@ import android.widget.Toast;
 
 import com.kingtous.remotefingerunlock.R;
 
+import java.util.Objects;
+
 
 public class Unlock extends Fragment{
 
@@ -27,6 +25,7 @@ public class Unlock extends Fragment{
     KeyguardManager keyguardManager;
     CancellationSignal cancellationSignal;
     FingerprintManager.AuthenticationCallback authenticationCallback;
+
 
     public Unlock(){
 
@@ -41,15 +40,19 @@ public class Unlock extends Fragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fingerprintManager=(FingerprintManager)getActivity().getSystemService(Activity.FINGERPRINT_SERVICE);
+        fingerprintManager=(FingerprintManager) Objects.requireNonNull(getActivity()).getSystemService(Activity.FINGERPRINT_SERVICE);
         keyguardManager=(KeyguardManager)getActivity().getSystemService(Activity.KEYGUARD_SERVICE);
         cancellationSignal=new CancellationSignal();
         //检测是否有硬件
         if (!fingerprintManager.isHardwareDetected()){
-            Toast.makeText(getContext(),"没找到相关指纹硬件，指纹解锁可能不生效",Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(),"没检测到相关指纹硬件，指纹解锁可能不生效",Toast.LENGTH_LONG).show();
         }
         initCallBack();
         startFingerListening();
+
+
+
+
     }
 
     private void initCallBack(){
