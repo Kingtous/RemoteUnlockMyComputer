@@ -60,8 +60,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(view, "远程解锁电脑Demo", Snackbar.LENGTH_LONG)
+                        .setAction("Yes", null).show();
             }
         });
 
@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity
         settings=new Settings();
         dataManagement=new DataManagement();
         switchFragment(unlock).commit();
+
+
+
 
     }
 
@@ -171,7 +174,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.About) {
             TextView view=new TextView(this);
-            SpannableString s=new SpannableString("  远程解锁电脑\n  作者:Kingtous\n  项目地址:\n  ");
+            SpannableString s=new SpannableString("  远程解锁电脑\n  作者:Kingtous\n  项目地址:https://github.com/Kingtous/RemoteUnlockMyComputer\n  ");
             Linkify.addLinks(s,Linkify.WEB_URLS);
             view.setText(s);
             view.setMovementMethod(LinkMovementMethod.getInstance());
