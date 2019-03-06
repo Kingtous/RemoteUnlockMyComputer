@@ -37,14 +37,6 @@
         android:textSize="20sp"
         />
 
-    <Button
-        android:id="@+id/TestRetroFit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/FingerMessage"
-        android:text="测试Retrofit"
-        />
 
 
 </RelativeLayout>

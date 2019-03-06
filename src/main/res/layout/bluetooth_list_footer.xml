@@ -12,8 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="搜索"
-        android:textSize="25dp"
+        android:textSize="15sp"
         android:layout_weight="1"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         />
 
     <Button
@@ -21,9 +23,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="连接"
-        android:textSize="25dp"
+        android:textSize="15sp"
         android:layout_toRightOf="@+id/btn_BLUETOOTH_search"
         android:layout_weight="1"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         />
 
 

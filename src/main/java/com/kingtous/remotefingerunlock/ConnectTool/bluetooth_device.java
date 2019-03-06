@@ -4,12 +4,14 @@ public class bluetooth_device {
 
     String name;
     String mac;
-    String uuid;
 
-    public bluetooth_device(String name, String mac, String uuid) {
+    public bluetooth_device(String name, String mac) {
+        if (name==null)
+        {
+            this.name="(未指定)";
+        }
         this.name = name;
         this.mac = mac;
-        this.uuid = uuid;
     }
 
     public String getName() {
@@ -28,11 +30,4 @@ public class bluetooth_device {
         this.mac = mac;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
 }

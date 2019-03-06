@@ -68,7 +68,7 @@ public class bluetooth_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         if (getItemViewType(position)==TYPE_DEVICES){
             ((deviceHolder)holder).name.setText(devices.get(position).getName());
-            ((deviceHolder)holder).name.setText(devices.get(position).getMac());
+            ((deviceHolder)holder).mac.setText(devices.get(position).getMac());
             //=======通过接口回调===========
             ((deviceHolder) holder).cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -76,8 +76,6 @@ public class bluetooth_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     mOnItemClickListener.OnClick(((deviceHolder) holder).cardView,position);
                 }
             });
-
-
         }
         else if (getItemViewType(position)==TYPE_FOOTER)
         {

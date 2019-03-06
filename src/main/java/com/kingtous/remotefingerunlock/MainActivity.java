@@ -85,8 +85,6 @@ public class MainActivity extends AppCompatActivity
         switchFragment(unlock).commit();
 
 
-
-
     }
 
 
@@ -162,13 +160,13 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.Unlock) {
             switchFragment(unlock).commit();
         } else if (id == R.id.Scan) {
-            switchFragment(scan).addToBackStack(null)
+            switchFragment(scan)
                     .commit();
         } else if (id == R.id.DataManagement) {
-            switchFragment(dataManagement).addToBackStack(null)
+            switchFragment(dataManagement)
                     .commit();
         } else if (id == R.id.Settings) {
-            switchFragment(settings).addToBackStack(null)
+            switchFragment(settings)
                     .commit();
         } else if (id == R.id.Share) {
 
