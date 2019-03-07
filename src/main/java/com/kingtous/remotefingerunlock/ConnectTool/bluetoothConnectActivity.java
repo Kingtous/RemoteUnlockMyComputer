@@ -22,10 +22,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.kingtous.remotefingerunlock.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -195,7 +197,12 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
                             bluetoothAdapter.enable();
                         }
                     })
-                    .setNegativeButton("取消",null)
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
                     .show();
         }
         //检查权限
@@ -287,15 +294,15 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
                             JSONObject object = new JSONObject();
                             if (name != null && passwd != null) {
                                 try {
-                                    object.put("user", name);
+                                    object.put("username", name);
                                     object.put("passwd", passwd);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                                 if (stream!= null)
                                 {
-                                    stream.write((name+" "+passwd).getBytes(StandardCharsets.UTF_8));
-                                    log("发送成功");
+                                    stream.write(object.toString().getBytes(StandardCharsets.UTF_8));
+                                    log("发送成功\n内容:"+object.toString());
                                 }
                                 else {
                                     log("未打开输出流，请检查设备是否开启服务端");
