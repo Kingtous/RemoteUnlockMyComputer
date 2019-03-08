@@ -12,6 +12,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.View;
 import com.google.android.material.navigation.NavigationView;
+import com.kingtous.remotefingerunlock.ToolFragment.about;
 import com.kingtous.remotefingerunlock.ToolFragment.DataManagement;
 import com.kingtous.remotefingerunlock.ToolFragment.Scan;
 import com.kingtous.remotefingerunlock.ToolFragment.Settings;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity
 
     FragmentManager fragmentManager;
 
-    Fragment unlock,scan,settings,dataManagement;
+    Fragment unlock,scan,settings,dataManagement,about;
     Fragment currentFragment;
     //request code
     int FINGER_REQUEST_CODE=1;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav);
         navigationView.setNavigationItemSelectedListener(this);
 
         checkPermission();
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity
         scan=new Scan();
         settings=new Settings();
         dataManagement=new DataManagement();
+        about=new about();
         switchFragment(unlock).commit();
 
 
@@ -171,16 +173,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.Share) {
 
         } else if (id == R.id.About) {
-            TextView view=new TextView(this);
-            SpannableString s=new SpannableString("  远程解锁电脑\n  作者:Kingtous\n  项目地址:https://github.com/Kingtous/RemoteUnlockMyComputer\n  ");
-            Linkify.addLinks(s,Linkify.WEB_URLS);
-            view.setText(s);
-            view.setMovementMethod(LinkMovementMethod.getInstance());
-
-            new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this).setTitle("关于")
-                    .setView(view)
-                    .setPositiveButton("好", null)
-                    .show();
+            switchFragment(about)
+                    .commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -63,6 +63,7 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
 
     Button btn_search;
     Button btn_connect;
+    Button btn_back;
 
     //请求码
     int Request_position=1;
@@ -81,6 +82,14 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
 
         btn_search=findViewById(R.id.btn_BLUETOOTH_search);
         btn_connect=findViewById(R.id.btn_BLUETOOTH_connect);
+        btn_back=findViewById(R.id.btn_BLUETOOTH_back);
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         BluetoothStatusView=findViewById(R.id.title_bluetooth_status);
 
         //下拉搜索
@@ -101,7 +110,6 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
                 getDeviceList();
             }
         });
-
 
 
         bluetoothManager=(BluetoothManager) getSystemService(Activity.BLUETOOTH_SERVICE);
