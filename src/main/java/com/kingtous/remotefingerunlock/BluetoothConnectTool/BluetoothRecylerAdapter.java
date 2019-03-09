@@ -1,4 +1,4 @@
-package com.kingtous.remotefingerunlock.ConnectTool;
+package com.kingtous.remotefingerunlock.BluetoothConnectTool;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,17 +15,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 
-public class bluetooth_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BluetoothRecylerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     int footer_postion=0;
     //原来加了footer的，现在不需要了
     int TYPE_FOOTER=0;
     int TYPE_DEVICES=1;
 
-    ArrayList<bluetooth_device> devices;
+    ArrayList<BluetoothDeviceData> devices;
     View footer;
 
-    bluetooth_Adapter(ArrayList<bluetooth_device> list){
+    BluetoothRecylerAdapter(ArrayList<BluetoothDeviceData> list){
        devices=list;
     }
 
@@ -126,8 +126,5 @@ public class bluetooth_Adapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             }
         }
     }
-
-
-
 
 }

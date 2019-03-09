@@ -1,11 +1,11 @@
-package com.kingtous.remotefingerunlock.ConnectTool;
+package com.kingtous.remotefingerunlock.BluetoothConnectTool;
 
-public class bluetooth_device {
+public class BluetoothDeviceData {
 
     String name;
     String mac;
 
-    public bluetooth_device(String name, String mac) {
+    public BluetoothDeviceData(String name, String mac) {
         if (name==null)
         {
             this.name="(未指定)";

@@ -1,9 +1,8 @@
-package com.kingtous.remotefingerunlock.ConnectTool;
+package com.kingtous.remotefingerunlock.BluetoothConnectTool;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
@@ -12,22 +11,24 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
+import com.kingtous.remotefingerunlock.DataStoreTool.DataQueryHelper;
+import com.kingtous.remotefingerunlock.DataStoreTool.RecordData;
+import com.kingtous.remotefingerunlock.DataStoreTool.RecordSQLTool;
 import com.kingtous.remotefingerunlock.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,22 +42,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class bluetoothConnectActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+public class BluetoothConnectActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     //蓝牙配置
     BluetoothManager bluetoothManager;
-    BluetoothAdapter bluetoothAdapter;
+    android.bluetooth.BluetoothAdapter bluetoothAdapter;
     //
     SwipeRefreshLayout swipeRefreshLayout;
     RecyclerView lst_view;
-    bluetooth_Adapter adapter;
+    BluetoothRecylerAdapter adapter;
     Set<BluetoothDevice> pairedDevices;//已配对设备
-    ArrayList<bluetooth_device> device_list;
+    ArrayList<BluetoothDeviceData> device_list;
     BluetoothDevice deviceSelected;
     IntentFilter filter;//广播
     TextView BluetoothStatusView;
@@ -124,10 +126,10 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
         lst_view.setLayoutManager(linearLayoutManager);
 
-        device_list=new ArrayList<bluetooth_device>();
+        device_list=new ArrayList<BluetoothDeviceData>();
 
-        adapter=new bluetooth_Adapter(device_list);
-        adapter.setOnItemClickListener(new bluetooth_Adapter.OnItemClickListener() {
+        adapter=new BluetoothRecylerAdapter(device_list);
+        adapter.setOnItemClickListener(new BluetoothRecylerAdapter.OnItemClickListener() {
             @Override
             public void OnClick(View view, int Position) {
                 //DEBUG: String name=((TextView)view.findViewById(R.id.name_bluetooth_device_name)).getText().toString();
@@ -135,7 +137,7 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
                 deviceSelected=bluetoothAdapter.getRemoteDevice(mac);
                 if (deviceSelected.getBondState()==BluetoothDevice.BOND_NONE)
                 {
-                    Toast.makeText(bluetoothConnectActivity.this,"还没配对，正在配对中...",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BluetoothConnectActivity.this,"还没配对，正在配对中...",Toast.LENGTH_SHORT).show();
                     deviceSelected.createBond();
                 }
                 else {
@@ -145,14 +147,19 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
             }
         });
 
+        DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
+        defaultItemAnimator.setAddDuration(300);
+        defaultItemAnimator.setRemoveDuration(300);
+        lst_view.setItemAnimator(defaultItemAnimator);
+
         lst_view.setAdapter(adapter);
 //        setFooterButtons(lst_view);
 
         //注册
         filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        filter.addAction(android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         registerReceiver(mReceiver, filter);
 
 
@@ -168,17 +175,34 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
 
     public void Query(){
 
-        final View et=LayoutInflater.from(this).inflate(R.layout.dialog_user_passwd,null,false);
+        final View view=LayoutInflater.from(this).inflate(R.layout.dialog_user_passwd,null,false);
 
         new AlertDialog.Builder(this).setTitle("请输入设备的账户名，密码")
-                .setIcon(android.R.drawable.sym_def_app_icon)
-                .setView(et)
+                .setView(view)
                 .setPositiveButton("发送", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         //按下确定键后的事件
-                        name=((EditText)et.findViewById(R.id.edit_username)).getText().toString();
-                        passwd=((EditText)et.findViewById(R.id.edit_passwd)).getText().toString();
+                        name=((EditText)view.findViewById(R.id.edit_username)).getText().toString();
+                        passwd=((EditText)view.findViewById(R.id.edit_passwd)).getText().toString();
+                        //检查checkbox
+                        CheckBox box_store=view.findViewById(R.id.dialog_checkbox_storeConnection);
+                        CheckBox box_default=view.findViewById(R.id.dialog_checkbox_setDefault);
+
+                        if (box_store.isChecked()){
+                            //保存
+                            SQLiteOpenHelper helper=new DataQueryHelper(BluetoothConnectActivity.this,getString(R.string.sqlDBName),null,1);
+                            boolean result=RecordSQLTool.addtoSQL(helper.getWritableDatabase(),new RecordData("Bluetooth",name,passwd,deviceSelected.getAddress()));
+                            if (!result)
+                                log("保存失败，存在同MAC地址的记录或者数据库异常");
+                            helper=null;
+                        }
+
+                        if (box_default.isChecked()){
+                            //设置为指纹默认
+
+                        }
+
                         startConnect();
                     }
                 })
@@ -229,7 +253,7 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 // Add the name and address to an array adapter to show in a ListView
-                device_list.add(new bluetooth_device(device.getName()+" (已配对)",device.getAddress()));
+                device_list.add(new BluetoothDeviceData(device.getName()+" (已配对)",device.getAddress()));
                 adapter.notifyDataSetChanged();
             }
         }
@@ -257,25 +281,25 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // Add the name and address to an array adapter to show in a ListView
                 if (!(pairedDevices.contains(device))) {
-                    for (bluetooth_device list_Dev : device_list) {
+                    for (BluetoothDeviceData list_Dev : device_list) {
                         if (list_Dev.getMac().equals(device.getAddress()))
                             return;
                     }
-                    device_list.add(new bluetooth_device(device.getName(), device.getAddress()));
+                    device_list.add(new BluetoothDeviceData(device.getName(), device.getAddress()));
                     adapter.notifyDataSetChanged();
                 }
             }
-            else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
+            else if (android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
             {
                 BluetoothStatusView.setText("正在搜索");
             }
-            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+            else if (android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 BluetoothStatusView.setText("搜索完成");
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
                 if (deviceSelected.getBondState() == BluetoothDevice.BOND_BONDED) {
                     Query();
                 } else if (deviceSelected.getBondState() == BluetoothDevice.BOND_NONE) {
-                    //Toast.makeText(bluetoothConnectActivity.this, "配对取消", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(BluetoothConnectActivity.this, "配对取消", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -340,14 +364,14 @@ public class bluetoothConnectActivity extends AppCompatActivity implements EasyP
     {
         for (int i=0;i<10;i++)
         {
-            bluetooth_device device=new bluetooth_device(String.valueOf(i),String.valueOf(i));
+            BluetoothDeviceData device=new BluetoothDeviceData(String.valueOf(i),String.valueOf(i));
             device_list.add(device);
         }
     }
 
     private void log(String text)
     {
-        Toast.makeText(bluetoothConnectActivity.this,text,Toast.LENGTH_SHORT).show();
+        Toast.makeText(BluetoothConnectActivity.this,text,Toast.LENGTH_SHORT).show();
     }
 
     @Override

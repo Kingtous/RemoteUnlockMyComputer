@@ -8,18 +8,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.kingtous.remotefingerunlock.ConnectTool.bluetoothConnectActivity;
+import com.kingtous.remotefingerunlock.BluetoothConnectTool.BluetoothConnectActivity;
 import com.kingtous.remotefingerunlock.R;
-
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class Scan extends Fragment {
+public class ScanFragment extends Fragment {
 
-    public Scan(){
+    public ScanFragment(){
 
     }
 
@@ -50,7 +48,7 @@ public class Scan extends Fragment {
         btn_BT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(getContext(), bluetoothConnectActivity.class);
+                Intent intent=new Intent(getContext(), BluetoothConnectActivity.class);
                 startActivityForResult(intent,BT_RequestCode);
             }
         });

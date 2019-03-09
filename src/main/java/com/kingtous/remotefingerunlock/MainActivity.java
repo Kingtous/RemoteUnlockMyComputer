@@ -4,19 +4,13 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
-import android.text.SpannableString;
-import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
-import android.view.View;
 import com.google.android.material.navigation.NavigationView;
-import com.kingtous.remotefingerunlock.ToolFragment.about;
-import com.kingtous.remotefingerunlock.ToolFragment.DataManagement;
-import com.kingtous.remotefingerunlock.ToolFragment.Scan;
-import com.kingtous.remotefingerunlock.ToolFragment.Settings;
-import com.kingtous.remotefingerunlock.ToolFragment.Unlock;
+import com.kingtous.remotefingerunlock.ToolFragment.AboutFragment;
+import com.kingtous.remotefingerunlock.ToolFragment.DataManagementFragment;
+import com.kingtous.remotefingerunlock.ToolFragment.ScanFragment;
+import com.kingtous.remotefingerunlock.ToolFragment.SettingsFragment;
+import com.kingtous.remotefingerunlock.ToolFragment.UnlockFragment;
 
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -30,7 +24,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -57,15 +50,6 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "远程解锁电脑Demo", Snackbar.LENGTH_LONG)
-                        .setAction("Yes", null).show();
-            }
-        });
-
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -79,13 +63,12 @@ public class MainActivity extends AppCompatActivity
 
         //fragment
         fragmentManager=getSupportFragmentManager();
-        unlock=new Unlock();
-        scan=new Scan();
-        settings=new Settings();
-        dataManagement=new DataManagement();
-        about=new about();
+        unlock=new UnlockFragment();
+        scan=new ScanFragment();
+        settings=new SettingsFragment();
+        dataManagement=new DataManagementFragment();
+        about=new AboutFragment();
         switchFragment(unlock).commit();
-
 
     }
 
@@ -100,7 +83,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPermissionsGranted(int requestCode, @androidx.annotation.NonNull List<String> perms) {
-        return;
+        return ;
     }
 
     @Override
@@ -184,15 +167,13 @@ public class MainActivity extends AppCompatActivity
 
     private FragmentTransaction switchFragment(Fragment targetFragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+
         if (!targetFragment.isAdded()) {
-         //第一次使用switchFragment()时currentFragment为null，所以要判断一下        
-            if (currentFragment != null) {
-                transaction.hide(currentFragment);
-            }
             transaction.add(R.id.fragmentShow,targetFragment,targetFragment.getClass().getName());
-        } else {
-            transaction.hide(currentFragment).show(targetFragment);
         }
+        transaction.replace(R.id.fragmentShow,targetFragment);
         currentFragment = targetFragment;
         return transaction;
     }

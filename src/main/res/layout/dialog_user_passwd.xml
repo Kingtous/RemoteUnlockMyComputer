@@ -4,24 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             >
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="账户名"
+                android:textColor="@color/black"
                 android:textSize="20sp"
-
                 />
 
             <EditText
@@ -30,29 +25,22 @@
                 android:layout_height="wrap_content"
 
                 />
-
         </LinearLayout>
 
 
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="密码"
+            android:textColor="@color/black"
             android:textSize="20sp"
             />
 
@@ -64,7 +52,29 @@
         </LinearLayout>
 
 
-    </androidx.cardview.widget.CardView>
+
+        <CheckBox
+            android:id="@+id/dialog_checkbox_storeConnection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="保存此连接"
+            android:textSize="15sp"
+            android:layout_weight="100"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+
+            />
+        <CheckBox
+            android:id="@+id/dialog_checkbox_setDefault"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="设置为默认指纹配置"
+            android:textSize="15sp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="100"
+            />
+
 
 
 

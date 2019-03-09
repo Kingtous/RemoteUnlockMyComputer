@@ -3,6 +3,7 @@ package com.kingtous.remotefingerunlock.ToolFragment;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -15,20 +16,25 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.kingtous.remotefingerunlock.Common.Connect;
+import com.kingtous.remotefingerunlock.DataStoreTool.DataQueryHelper;
+import com.kingtous.remotefingerunlock.DataStoreTool.RecordData;
+import com.kingtous.remotefingerunlock.DataStoreTool.RecordSQLTool;
 import com.kingtous.remotefingerunlock.R;
 
 import java.util.Objects;
 
 
-public class Unlock extends Fragment {
+public class UnlockFragment extends Fragment {
 
     FingerprintManager fingerprintManager;
     KeyguardManager keyguardManager;
     CancellationSignal cancellationSignal;
     FingerprintManager.AuthenticationCallback authenticationCallback;
+    SQLiteOpenHelper helper;
 
     Context context;
-    public Unlock() {
+    public UnlockFragment() {
 
     }
 
@@ -36,6 +42,12 @@ public class Unlock extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.unlock, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        helper=new DataQueryHelper(context,getString(R.string.sqlDBName),null,1);
     }
 
     @Override
@@ -68,7 +80,13 @@ public class Unlock extends Fragment {
 
             @Override
             public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
-                Toast.makeText(context, "指纹认证成功", Toast.LENGTH_LONG).show();
+                RecordData data=RecordSQLTool.getDefaultRecordData(helper.getReadableDatabase());
+                if (data!=null)
+                {
+                    Toast.makeText(context,"验证成功，连接中...",Toast.LENGTH_SHORT).show();
+                    Connect.start(data);
+                }
+                else Toast.makeText(context,"还未配置默认连接，请到设置中配置或在扫描时添加默认配置",Toast.LENGTH_LONG).show();
                 startFingerListening();
             }
 
@@ -92,4 +110,6 @@ public class Unlock extends Fragment {
         super.onDestroy();
         cancellationSignal.cancel();
     }
+
+
 }

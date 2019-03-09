@@ -7,4 +7,6 @@
     <string name="nav_header_desc">菜单栏</string>
     <string name="action_settings">设置</string>
     <string name="UnlockTip">验证指纹解锁</string>
+    <string name="app_version">Version 1.1</string>
+    <string name="sqlDBName">DataBase</string>
 </resources>

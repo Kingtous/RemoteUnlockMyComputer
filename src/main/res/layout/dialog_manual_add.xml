@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    >
+<LinearLayout
+    android:id="@+id/manual_type_group"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_marginTop="20dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="连接方式"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        />
+
+    <RadioGroup
+        android:id="@+id/manual_type_selected"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+            <RadioButton
+                android:id="@+id/manual_type_wlan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="WLAN"
+                android:layout_weight="100"
+
+                />
+            <RadioButton
+                android:id="@+id/manual_type_bluetooth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="100"
+                android:text="蓝牙"
+                />
+
+
+    </RadioGroup>
+
+
+</LinearLayout>
+
+    <TextView
+        android:id="@+id/manual_mac"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="MAC地址"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_below="@+id/manual_type_group"
+        />
+
+    <EditText
+        android:id="@+id/manual_mac_edit"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/manual_mac"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="Mac Address..." />
+
+    <TextView
+        android:id="@+id/manual_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="账号"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_below="@id/manual_mac_edit"
+        />
+
+    <EditText
+        android:id="@+id/manual_user_edit"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/manual_user"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="User Name..." />
+
+    <TextView
+        android:id="@+id/manual_passwd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="密码"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_below="@id/manual_user_edit"
+        />
+
+    <EditText
+        android:id="@+id/manual_passwd_edit"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/manual_passwd"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="Password..."
+        android:inputType="textPassword" />
+
+    <CheckBox
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/manual_passwd_edit"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:textColor="@color/black"
+        android:text="设为指纹默认"
+        android:textSize="15sp"
+
+        />
+
+
+</RelativeLayout>

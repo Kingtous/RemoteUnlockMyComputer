@@ -15,13 +15,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-public class about extends Fragment {
+public class AboutFragment extends Fragment {
 
     Button btn_url;
 
     String address="https://github.com/Kingtous/RemoteUnlockMyComputer";
 
-    public about()
+    public AboutFragment()
     {
 
     }
