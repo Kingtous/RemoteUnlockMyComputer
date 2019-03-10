@@ -84,7 +84,7 @@ public class UnlockFragment extends Fragment {
                 if (data!=null)
                 {
                     Toast.makeText(context,"验证成功，连接中...",Toast.LENGTH_SHORT).show();
-                    Connect.start(data);
+                    Connect.start(context,data);
                 }
                 else Toast.makeText(context,"还未配置默认连接，请到设置中配置或在扫描时添加默认配置",Toast.LENGTH_LONG).show();
                 startFingerListening();

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -17,11 +18,11 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.kingtous.remotefingerunlock.Common.Connect;
 import com.kingtous.remotefingerunlock.DataStoreTool.DataQueryHelper;
 import com.kingtous.remotefingerunlock.DataStoreTool.RecordData;
 import com.kingtous.remotefingerunlock.DataStoreTool.RecordAdapter;
 import com.kingtous.remotefingerunlock.DataStoreTool.RecordSQLTool;
-import com.kingtous.remotefingerunlock.DataStoreTool.SecurityTransform;
 import com.kingtous.remotefingerunlock.R;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
     Pattern pattern=Pattern.compile(macRegex);
 
 
-    private ArrayList<RecordData> recordData;
+    private ArrayList<RecordData> recordDataArrayList;
 
     private RecyclerView data_view;
     private RecordAdapter adapter;
@@ -82,7 +83,7 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
 
     private void update()
     {
-        if (recordData.size()==0)
+        if (recordDataArrayList.size()==0)
         {
             app_empty.setVisibility(View.VISIBLE);
         }
@@ -98,7 +99,7 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
                 //删除SQL中的元素
                 writeSQL.execSQL("delete from data where Mac=" + mac);
                 //删除List中的
-                this.recordData.remove(recordData);
+                this.recordDataArrayList.remove(recordData);
             }
             catch (Exception e)
             {
@@ -108,18 +109,14 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
     }
 
     public void updateRecord(RecordData recordData, RecordData newlyRecordData){
+        //仅更新数据库
         if (writeSQL!=null)
         {
-            String mac="'"+ recordData.getMac()+"'";
-
-            ContentValues values=new ContentValues();
-            values.put("Mac", newlyRecordData.getMac());
-            values.put("User", newlyRecordData.getUser());
-            values.put("Type", newlyRecordData.getType());
-            values.put("Passwd", newlyRecordData.getPasswd());
-            String[] cond=new String[]{mac};
             try {
-                writeSQL.update("data",values,"Mac=?",cond);
+                RecordSQLTool.updatetoSQL(helper.getWritableDatabase(),recordData,newlyRecordData);
+                if (newlyRecordData.getIsDefault()==RecordData.TRUE){
+                    RecordSQLTool.updateDefaultRecord(helper,newlyRecordData.getMac());
+                }
             }
             catch (Exception e)
             {
@@ -138,7 +135,7 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
                     ("data",null,null,null,null,null,"Type");
             while (cursor.moveToNext()){
                 RecordData recordData =RecordSQLTool.toRecordData(cursor);
-                this.recordData.add(recordData);
+                this.recordDataArrayList.add(recordData);
             }
             update();
             cursor.close();
@@ -146,35 +143,17 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
     }
 
 
-    private void addRecord(String Type,String user,String passwd,String mac)
+    private void addRecord(String Type,String user,String passwd,String mac,int setDefault)
     {
         if (user.equals("") || passwd.equals("") || mac.equals(""))
         {
             Toast.makeText(getContext(),"输入数据不合法",Toast.LENGTH_SHORT).show();
         }
         else {
-
-            ContentValues values=new ContentValues();
-            values.put("Type",Type);
-            values.put("Mac",mac);
-            values.put("User",user);
-            values.put("Passwd",passwd);
-            try {
-                writeSQL.insert("data",null,values);
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-
-            RecordData recordDataTobeAdd =new RecordData();
-            recordDataTobeAdd.setType(Type);
-            recordDataTobeAdd.setUser(user);
-            recordDataTobeAdd.setPasswd(SecurityTransform.encrypt(passwd));
-            recordDataTobeAdd.setMac(mac);
-            recordData.add(recordDataTobeAdd);
-
+            RecordData data=new RecordData(Type,user,passwd,mac,setDefault);
+            RecordSQLTool.addtoSQL(helper,data);
+            recordDataArrayList.add(data);
             update();
-
             Toast.makeText(getContext(),"存储成功",Toast.LENGTH_LONG).show();
         }
     }
@@ -184,7 +163,7 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view=inflater.inflate(R.layout.data_management,container,false);
-        recordData =new ArrayList<>();
+        recordDataArrayList =new ArrayList<>();
         data_view= view.findViewById(R.id.data_list);
         floatingActionButton=view.findViewById(R.id.data_floatButton);
         app_empty=view.findViewById(R.id.app_empty);
@@ -213,14 +192,19 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
                                     Matcher matcher=pattern.matcher(mac.getText().toString());
                                     final EditText user=diaView.findViewById(R.id.manual_user_edit);
                                     final EditText passwd=diaView.findViewById(R.id.manual_passwd_edit);
+                                    CheckBox checkBox=diaView.findViewById(R.id.manual_setDefault);
                                     //先测试
                                     if (!matcher.matches())
                                     {
                                         Toast.makeText(getContext(),"MAC地址不合法",Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-                                addRecord(type,user.getText().toString(),passwd.getText().toString()
-                                        ,mac.getText().toString());
+                                        return;
+                                    }
+                                    if (checkBox.isChecked()){
+                                        addRecord(type,user.getText().toString(),passwd.getText().toString()
+                                                ,mac.getText().toString(),RecordData.TRUE);
+                                    }
+                                    else addRecord(type,user.getText().toString(),passwd.getText().toString()
+                                            ,mac.getText().toString(),RecordData.FALSE);
                             }
                         })
                         .setNegativeButton("取消",null)
@@ -243,7 +227,7 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
         data_view.setLayoutManager(layoutManager);
 
         //适配器
-        adapter=new RecordAdapter(recordData);
+        adapter=new RecordAdapter(recordDataArrayList);
         adapter.setOnItemClickListener(new RecordAdapter.OnItemClickListener() {
 
             @Override
@@ -253,15 +237,17 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
                     //编辑
                     View view1= LayoutInflater.from(getContext()).inflate(R.layout.dialog_manual_add,null,false);
 
-                    String recordType= recordData.getType();
+                    final String recordType= recordData.getType();
                     String mac= recordData.getMac();
                     String user= recordData.getUser();
                     String passwd= recordData.getPasswd();
+                    int isDefault=recordData.getIsDefault();
 
                     final RadioGroup group=((RadioGroup)view1.findViewById(R.id.manual_type_selected));
                     final EditText macEdit=((EditText)view1.findViewById(R.id.manual_mac_edit));
                     final EditText userEdit= ((EditText)view1.findViewById(R.id.manual_user_edit));
                     final EditText passwdEdit= ((EditText)view1.findViewById(R.id.manual_passwd_edit));
+                    final CheckBox checkBox=(CheckBox)view1.findViewById(R.id.manual_setDefault);
 
                     //填入数据
                     //Type
@@ -272,6 +258,11 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
                     macEdit.setText(mac);
                     userEdit.setText(user);
                     passwdEdit.setText(passwd);
+                    if (recordData.getIsDefault()==RecordData.TRUE){
+                        //是默认的指纹设置
+                        checkBox.setChecked(true);
+                    }
+                    else checkBox.setChecked(false);
 
                     new AlertDialog.Builder(getContext())
                             .setView(view1)
@@ -283,12 +274,36 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
                                     if (group.getCheckedRadioButtonId()==R.id.manual_type_bluetooth){
                                         newRecordData.setType("Bluetooth");
                                     }
+
                                     else newRecordData.setType("WLAN");
                                     newRecordData.setMac(macEdit.getText().toString());
                                     newRecordData.setUser(userEdit.getText().toString());
                                     newRecordData.setPasswd(passwdEdit.getText().toString());
 
+                                    if (checkBox.isChecked())
+                                    {
+                                        newRecordData.setIsDefault(RecordData.TRUE);
+                                    }
+                                    else newRecordData.setIsDefault(RecordData.FALSE);
+                                    //更新数据库
                                     updateRecord(recordData, newRecordData);
+                                    //更新前端
+                                    for (int i=0;i<recordDataArrayList.size();++i){
+                                        if (recordDataArrayList.get(i).getMac().equals(recordData.getMac())){
+                                            recordDataArrayList.remove(i);
+                                            recordDataArrayList.add(i,newRecordData);
+                                            break;
+                                        }
+                                        else {
+                                            if (newRecordData.getIsDefault()==RecordData.TRUE){
+                                                //如果是默认的话，更新前端的"默认"显示
+                                                RecordData data=recordDataArrayList.get(i);
+                                                data.setIsDefault(RecordData.FALSE);
+                                                recordDataArrayList.set(i,data);
+                                            }
+                                        }
+                                    }
+
                                     update();
                                 }
                             })
@@ -311,6 +326,11 @@ public class DataManagementFragment extends Fragment implements EasyPermissions.
                             .setNegativeButton("取消",null)
                             .show();
 
+                }
+                else if (type==RecordAdapter.CONNECT_BUTTON){
+                    //连接
+                    Toast.makeText(getContext(),"正在连接",Toast.LENGTH_LONG).show();
+                    Connect.start(getContext(),recordData);
                 }
             }
         });

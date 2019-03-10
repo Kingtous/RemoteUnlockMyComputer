@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,8 +69,8 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
     Button btn_back;
 
     //请求码
-    int Request_position=1;
-    String MY_UUID="4E5877C0-8297-4AAE-B7BD-73A8CBC1EDAF";
+    static int Request_position=1;
+    static String MY_UUID="4E5877C0-8297-4AAE-B7BD-73A8CBC1EDAF";
 
     //
     String name;
@@ -143,7 +144,6 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
                 else {
                     Query();
                 }
-
             }
         });
 
@@ -177,6 +177,20 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
 
         final View view=LayoutInflater.from(this).inflate(R.layout.dialog_user_passwd,null,false);
 
+        //设置CheckBox关系
+        final CheckBox box_store=view.findViewById(R.id.dialog_checkbox_storeConnection);
+        final CheckBox box_default=view.findViewById(R.id.dialog_checkbox_setDefault);
+
+        box_default.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    box_store.setChecked(true);
+                }
+            }
+        });
+
         new AlertDialog.Builder(this).setTitle("请输入设备的账户名，密码")
                 .setView(view)
                 .setPositiveButton("发送", new DialogInterface.OnClickListener() {
@@ -186,23 +200,19 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
                         name=((EditText)view.findViewById(R.id.edit_username)).getText().toString();
                         passwd=((EditText)view.findViewById(R.id.edit_passwd)).getText().toString();
                         //检查checkbox
-                        CheckBox box_store=view.findViewById(R.id.dialog_checkbox_storeConnection);
-                        CheckBox box_default=view.findViewById(R.id.dialog_checkbox_setDefault);
 
+                        SQLiteOpenHelper helper=new DataQueryHelper(BluetoothConnectActivity.this,getString(R.string.sqlDBName),null,1);
                         if (box_store.isChecked()){
                             //保存
-                            SQLiteOpenHelper helper=new DataQueryHelper(BluetoothConnectActivity.this,getString(R.string.sqlDBName),null,1);
-                            boolean result=RecordSQLTool.addtoSQL(helper.getWritableDatabase(),new RecordData("Bluetooth",name,passwd,deviceSelected.getAddress()));
+                            boolean result=RecordSQLTool.addtoSQL(helper,new RecordData("Bluetooth",name,passwd,deviceSelected.getAddress()));
                             if (!result)
                                 log("保存失败，存在同MAC地址的记录或者数据库异常");
-                            helper=null;
                         }
-
                         if (box_default.isChecked()){
                             //设置为指纹默认
-
+                            RecordSQLTool.updateDefaultRecord(helper,deviceSelected.getAddress());
                         }
-
+                        helper=null;
                         startConnect();
                     }
                 })
@@ -309,7 +319,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
 
     private void connect()
     {
-        bluetoothAdapter.cancelDiscovery();
+            bluetoothAdapter.cancelDiscovery();
             if (deviceSelected.getBondState() == BluetoothDevice.BOND_NONE) {
                 deviceSelected.createBond();
             } else {
@@ -353,8 +363,6 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
                         }
                     }
                 }).start();
-
-
             }
         }
 

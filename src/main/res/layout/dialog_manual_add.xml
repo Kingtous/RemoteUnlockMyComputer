@@ -115,6 +115,7 @@
         android:inputType="textPassword" />
 
     <CheckBox
+        android:id="@+id/manual_setDefault"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/manual_passwd_edit"
@@ -123,7 +124,6 @@
         android:textColor="@color/black"
         android:text="设为指纹默认"
         android:textSize="15sp"
-
         />
 
 

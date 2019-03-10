@@ -15,8 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-    int EDIT_BUTTON=0;
-    int DELETE_BUTTON=1;
+    public static int EDIT_BUTTON=0;
+    public static int DELETE_BUTTON=1;
+    public static int CONNECT_BUTTON=2;
 
     ArrayList<RecordData> recordDataArrayList;
 
@@ -61,8 +62,21 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     mOnItemClickListener.OnClick(DELETE_BUTTON, recordDataArrayList.get(position));
                 }
             });
+            ((recordHolder)holder).toConnect.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickListener.OnClick(CONNECT_BUTTON,recordDataArrayList.get(position));
+                }
+            });
+
+            //判断默认，是则显示默认
+            if (recordDataArrayList.get(position).getIsDefault()==RecordData.TRUE){
+                ((recordHolder)holder).showDefault.setVisibility(View.VISIBLE);
+            }
+            else ((recordHolder)holder).showDefault.setVisibility(View.GONE);
 
         }
+
 
     @Override
     public int getItemCount() {
@@ -77,6 +91,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public TextView mac;
         public Button toEdit;
         public Button toDelete;
+        public Button toConnect;
+        public TextView showDefault;
 
         public recordHolder(@NonNull View itemView) {
             super(itemView);
@@ -85,7 +101,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             type=itemView.findViewById(R.id.record_type);
             toEdit=itemView.findViewById(R.id.record_edit);
             toDelete=itemView.findViewById(R.id.record_delete);
-
+            toConnect=itemView.findViewById(R.id.record_connect);
+            showDefault=itemView.findViewById(R.id.record_sign_default);
             }
 
         }
