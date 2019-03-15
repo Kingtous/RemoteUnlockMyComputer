@@ -1,10 +1,11 @@
-package com.kingtous.remotefingerunlock.BluetoothConnectTool;
+package com.kingtous.remotefingerunlock.WLANConnectTool;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.kingtous.remotefingerunlock.WLANConnectTool.WLANRecyclerAdapter;
 import com.kingtous.remotefingerunlock.R;
 
 import java.util.ArrayList;
@@ -13,20 +14,18 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-
-public class BluetoothRecylerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class WLANRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     int footer_postion=0;
     //原来加了footer的，现在不需要了
     int TYPE_FOOTER=0;
     int TYPE_DEVICES=1;
 
-    ArrayList<BluetoothDeviceData> devices;
+    ArrayList<WLANDeviceData> devices;
     View footer;
 
-    BluetoothRecylerAdapter(ArrayList<BluetoothDeviceData> list){
-       devices=list;
+    WLANRecyclerAdapter(ArrayList<WLANDeviceData> list){
+        devices=list;
     }
 
 
@@ -35,9 +34,9 @@ public class BluetoothRecylerAdapter extends RecyclerView.Adapter<RecyclerView.V
         void OnClick(View view,int Position);
     }
 
-    private OnItemClickListener mOnItemClickListener;
+    private WLANRecyclerAdapter.OnItemClickListener mOnItemClickListener;
 
-    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener){
+    public void setOnItemClickListener(WLANRecyclerAdapter.OnItemClickListener mOnItemClickListener){
         this.mOnItemClickListener = mOnItemClickListener;
     }
     //=========暴露接口=========
@@ -58,22 +57,22 @@ public class BluetoothRecylerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (viewType==footer_postion && footer!=null)
         {
-            return new deviceHolder(footer);
+            return new WLANRecyclerAdapter.deviceHolder(footer);
         }
-        View layout= LayoutInflater.from(parent.getContext()).inflate(R.layout.bluetooth_device_item,parent,false);
-        return new deviceHolder(layout);
+        View layout= LayoutInflater.from(parent.getContext()).inflate(R.layout.wlan_device_item,parent,false);
+        return new WLANRecyclerAdapter.deviceHolder(layout);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         if (getItemViewType(position)==TYPE_DEVICES){
-            ((deviceHolder)holder).name.setText(devices.get(position).getName());
-            ((deviceHolder)holder).mac.setText(devices.get(position).getMac());
+            ((WLANRecyclerAdapter.deviceHolder)holder).name.setText(devices.get(position).getName());
+            ((WLANRecyclerAdapter.deviceHolder)holder).mac.setText(devices.get(position).getMac());
             //=======通过接口回调===========
-            ((deviceHolder) holder).cardView.setOnClickListener(new View.OnClickListener() {
+            ((WLANRecyclerAdapter.deviceHolder) holder).cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickListener.OnClick(((deviceHolder) holder).cardView,position);
+                    mOnItemClickListener.OnClick(((WLANRecyclerAdapter.deviceHolder) holder).cardView,position);
                 }
             });
         }
@@ -84,8 +83,6 @@ public class BluetoothRecylerAdapter extends RecyclerView.Adapter<RecyclerView.V
         else {
             return;
         }
-
-
 
     }
 
@@ -101,7 +98,6 @@ public class BluetoothRecylerAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemViewType(int position) {
-
 //        if (position==getItemCount()-1){
 //            //最后是footer
 //            return TYPE_FOOTER;
@@ -114,17 +110,18 @@ public class BluetoothRecylerAdapter extends RecyclerView.Adapter<RecyclerView.V
         public CardView cardView;
         public TextView name;
         public TextView mac;
+        public TextView currentIP;
 
         public deviceHolder(@NonNull View itemView) {
             super(itemView);
             if (itemView==footer)
                 return;
             else {
-                name=itemView.findViewById(R.id.name_bluetooth_device_name);
-                mac=itemView.findViewById(R.id.name_bluetooth_device_mac);
-                cardView=itemView.findViewById(R.id.card_BLUETOOTH);
+                name=itemView.findViewById(R.id.name_WLAN_device_name);
+                mac=itemView.findViewById(R.id.name_WLAN_device_mac);
+                cardView=itemView.findViewById(R.id.card_WLAN);
+                currentIP=itemView.findViewById(R.id.name_WLAN_device_ip);
             }
         }
     }
-
 }

@@ -30,4 +30,6 @@ dependencies {
     //依赖包
     implementation 'pub.devrel:easypermissions:3.0.0'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'me.imid.swipebacklayout.lib:library:1.1.0'
+    implementation 'com.github.sd6352051:NiftyDialogEffects:v1.0.3'
 }

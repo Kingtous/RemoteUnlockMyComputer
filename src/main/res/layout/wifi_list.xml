@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".BluetoothConnectTool.BluetoothConnectActivity">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/title_WLAN"
+        android:text="服务器列表(WLAN)"
+        android:textSize="20sp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="16dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/title_bluetooth"
+        android:id="@+id/title_WLAN_status"
+        android:visibility="visible"
+        android:layout_marginTop="12dp"
+        android:layout_marginLeft="225dp"
+
+        />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lst_WLAN_swipe"
+        android:layout_above="@+id/footer_WLAN"
+        android:layout_below="@+id/title_WLAN"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        >
+
+
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lst_WLAN"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            >
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <include
+        layout="@layout/wlan_list_footer"
+        android:id="@+id/footer_WLAN"
+        />
+
+
+</RelativeLayout>

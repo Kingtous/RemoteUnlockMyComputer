@@ -1,12 +1,14 @@
-package com.kingtous.remotefingerunlock.BluetoothConnectTool;
+package com.kingtous.remotefingerunlock.WLANConnectTool;
 
-public class BluetoothDeviceData {
+public class WLANDeviceData  {
+
 
     String name;
     String mac;
+    String currentIP;
 
-    public BluetoothDeviceData(String name, String mac) {
-        if (name==null || name.equals(""))
+    public WLANDeviceData(String name, String mac) {
+        if (name==null ||name.equals(""))
         {
             this.name="(未指定)";
         }
@@ -30,4 +32,12 @@ public class BluetoothDeviceData {
         this.mac = mac;
     }
 
+
+    public String getCurrentIP() {
+        return currentIP;
+    }
+
+    public void setCurrentIP(String currentIP) {
+        this.currentIP = currentIP;
+    }
 }

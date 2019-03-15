@@ -1,6 +1,7 @@
 package com.kingtous.remotefingerunlock.ToolFragment;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import com.google.android.material.snackbar.Snackbar;
 import com.kingtous.remotefingerunlock.BluetoothConnectTool.BluetoothConnectActivity;
 import com.kingtous.remotefingerunlock.R;
+import com.kingtous.remotefingerunlock.WLANConnectTool.WLANConnectActivity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,8 +41,10 @@ public class ScanFragment extends Fragment {
         btn_WL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(v, "正在开发中...", Snackbar.LENGTH_LONG)
-                        .setAction("OK", null).show();
+//                Snackbar.make(v, "正在开发中...", Snackbar.LENGTH_LONG)
+//                        .setAction("OK", null).show();
+                Intent intent=new Intent(getContext(), WLANConnectActivity.class);
+                startActivityForResult(intent,WL_RequestCode);
             }
         });
 

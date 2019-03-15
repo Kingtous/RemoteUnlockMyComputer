@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
+import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.kingtous.remotefingerunlock.ToolFragment.AboutFragment;
 import com.kingtous.remotefingerunlock.ToolFragment.DataManagementFragment;
@@ -20,14 +22,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends SwipeBackActivity
         implements NavigationView.OnNavigationItemSelectedListener,EasyPermissions.PermissionCallbacks {
 
     Toolbar toolbar;
@@ -88,19 +92,21 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onPermissionsDenied(int requestCode, @androidx.annotation.NonNull List<String> perms) {
-        if (requestCode==FINGER_REQUEST_CODE){
-            new AlertDialog.Builder(this)
-                    .setTitle("权限获取")
-                    .setMessage("权限获取失败，请允许指纹权限")
-                    .setPositiveButton("好", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .show();
 
-        }
+        final NiftyDialogBuilder builder=NiftyDialogBuilder.getInstance(MainActivity.this);
+        builder.withTitle("权限获取")
+                .withEffect(Effectstype.Shake)
+                .withMessage("权限获取失败，请允许指纹权限")
+                .withButton1Text("好")
+                .setButton1Click(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                        builder.dismiss();
+                    }
+                })
+                .show();
+
     }
 
 

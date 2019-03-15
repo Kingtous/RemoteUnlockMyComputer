@@ -3,6 +3,7 @@ package com.kingtous.remotefingerunlock.BluetoothConnectTool;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
@@ -23,9 +24,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gitonway.lee.niftymodaldialogeffects.lib.Effectstype;
+import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import com.kingtous.remotefingerunlock.DataStoreTool.DataQueryHelper;
 import com.kingtous.remotefingerunlock.DataStoreTool.RecordData;
 import com.kingtous.remotefingerunlock.DataStoreTool.RecordSQLTool;
+import com.kingtous.remotefingerunlock.MainActivity;
 import com.kingtous.remotefingerunlock.R;
 
 import org.json.JSONException;
@@ -47,17 +51,18 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import me.imid.swipebacklayout.lib.app.SwipeBackActivity;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class BluetoothConnectActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+public class BluetoothConnectActivity extends SwipeBackActivity implements EasyPermissions.PermissionCallbacks {
 
     //蓝牙配置
     BluetoothManager bluetoothManager;
-    android.bluetooth.BluetoothAdapter bluetoothAdapter;
+    BluetoothAdapter bluetoothAdapter;
     //
     SwipeRefreshLayout swipeRefreshLayout;
     RecyclerView lst_view;
-    BluetoothRecylerAdapter adapter;
+    BluetoothRecyclerAdapter adapter;
     Set<BluetoothDevice> pairedDevices;//已配对设备
     ArrayList<BluetoothDeviceData> device_list;
     BluetoothDevice deviceSelected;
@@ -83,9 +88,16 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_list);
 
-        btn_search=findViewById(R.id.btn_BLUETOOTH_search);
-        btn_connect=findViewById(R.id.btn_BLUETOOTH_connect);
-        btn_back=findViewById(R.id.btn_BLUETOOTH_back);
+        //注册
+        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        filter.addAction(android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        registerReceiver(mReceiver, filter);
+
+        btn_search=(Button) findViewById(R.id.btn_BLUETOOTH_search);
+        btn_connect=(Button)findViewById(R.id.btn_BLUETOOTH_connect);
+        btn_back=(Button)findViewById(R.id.btn_BLUETOOTH_back);
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,10 +105,10 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
             }
         });
 
-        BluetoothStatusView=findViewById(R.id.title_bluetooth_status);
+        BluetoothStatusView=(TextView)findViewById(R.id.title_bluetooth_status);
 
         //下拉搜索
-        swipeRefreshLayout=findViewById(R.id.lst_BLUETOOTH_swipe);
+        swipeRefreshLayout=(SwipeRefreshLayout) findViewById(R.id.lst_BLUETOOTH_swipe);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -115,22 +127,23 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
         });
 
 
-        bluetoothManager=(BluetoothManager) getSystemService(Activity.BLUETOOTH_SERVICE);
 
+
+        bluetoothManager=(BluetoothManager) getSystemService(Activity.BLUETOOTH_SERVICE);
         bluetoothAdapter=bluetoothManager.getAdapter();
         if (bluetoothAdapter==null){
             Toast.makeText(this,"设备不支持蓝牙",Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        lst_view=findViewById(R.id.lst_BLUETOOTH);
+        lst_view=(RecyclerView) findViewById(R.id.lst_BLUETOOTH);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
         lst_view.setLayoutManager(linearLayoutManager);
 
         device_list=new ArrayList<BluetoothDeviceData>();
 
-        adapter=new BluetoothRecylerAdapter(device_list);
-        adapter.setOnItemClickListener(new BluetoothRecylerAdapter.OnItemClickListener() {
+        adapter=new BluetoothRecyclerAdapter(device_list);
+        adapter.setOnItemClickListener(new BluetoothRecyclerAdapter.OnItemClickListener() {
             @Override
             public void OnClick(View view, int Position) {
                 //DEBUG: String name=((TextView)view.findViewById(R.id.name_bluetooth_device_name)).getText().toString();
@@ -155,16 +168,11 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
         lst_view.setAdapter(adapter);
 //        setFooterButtons(lst_view);
 
-        //注册
-        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        filter.addAction(android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        filter.addAction(android.bluetooth.BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        registerReceiver(mReceiver, filter);
 
 
         //已配对
-        getDeviceList();
+        if (bluetoothAdapter!=null)
+            getDeviceList();
 
     }
 
@@ -230,18 +238,23 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
     {
         if (!bluetoothAdapter.isEnabled())
         {
-            new AlertDialog.Builder(this)
-                    .setMessage("蓝牙未打开")
-                    .setMessage("请打开蓝牙")
-                    .setPositiveButton("打开", new DialogInterface.OnClickListener() {
+
+            final NiftyDialogBuilder builder=NiftyDialogBuilder.getInstance(BluetoothConnectActivity.this);
+            builder.withEffect(Effectstype.Shake)
+                    .withDialogColor(R.color.dodgerblue)
+                    .withMessage("蓝牙未打开，是否打开蓝牙？")
+                    .withButton1Text("打开")
+                    .withButton2Text("取消")
+                    .setButton1Click(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
                             bluetoothAdapter.enable();
+                            builder.dismiss();
                         }
                     })
-                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    .setButton2Click(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(View v) {
                             finish();
                         }
                     })
@@ -395,7 +408,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements EasyP
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mReceiver);
 
+        unregisterReceiver(mReceiver);
     }
 }
