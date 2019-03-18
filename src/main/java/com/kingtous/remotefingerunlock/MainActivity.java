@@ -29,9 +29,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.List;
 
-public class MainActivity extends SwipeBackActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,EasyPermissions.PermissionCallbacks {
 
     Toolbar toolbar;
@@ -73,6 +76,7 @@ public class MainActivity extends SwipeBackActivity
         dataManagement=new DataManagementFragment();
         about=new AboutFragment();
         switchFragment(unlock).commit();
+
 
     }
 
@@ -147,9 +151,12 @@ public class MainActivity extends SwipeBackActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if (id == currentFragment.getId())
+            return false;
 
         if (id == R.id.Unlock) {
-            switchFragment(unlock).commit();
+            switchFragment(unlock)
+                    .commit();
         } else if (id == R.id.Scan) {
             switchFragment(scan)
                     .commit();

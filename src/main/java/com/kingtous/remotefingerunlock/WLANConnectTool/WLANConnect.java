@@ -7,8 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
+import android.widget.Toast;
 
 import com.kingtous.remotefingerunlock.DataStoreTool.RecordData;
+
+import java.util.TooManyListenersException;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -71,7 +74,9 @@ public class WLANConnect {
 
 
     private void startConnect(Context context,RecordData data){
-
+        WLANClient client=new WLANClient(context,data.getMac(),WLANDeviceData.port,data);
+        Toast.makeText(context,"正在连接中",Toast.LENGTH_LONG).show();
+        client.execute();
     }
 
 }
