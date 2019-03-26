@@ -6,7 +6,9 @@
 
 - 提供指纹和账号密码两种方式解锁电脑等设备
 
-
+## Mar 26, 2019
+迁移至新仓库
+https://github.com/Kingtous/UnlockMyComputer
 
 ## Mar 11, 2019
 
